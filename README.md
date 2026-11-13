@@ -26,8 +26,20 @@
 | `index.html` | 画面とすべての処理。Artifact に公開する本体（`<html>` や `<body>` は公開時に付きます） |
 | `qr.js` | QRコード生成ライブラリ（Kazuhiko Arase 氏作、MITライセンス） |
 | `jsqr.js` | QRコード読み取りライブラリ jsQR 1.4.0（Apache License 2.0） |
+| `standalone.js` | Claude の外（GitHub Pages など）で単体のデモとして動かすための仮の保存先 |
+| `build.mjs` | GitHub Pages 用のページを `docs/` に作るスクリプト |
+| `docs/` | GitHub Pages で公開する完成品（`node build.mjs` で作り直します。直接は編集しません） |
 | `test/run.js` | 自動テスト（通常・イレギュラー・環境別・表示の114項目） |
+| `test/smoke.js` | GitHub Pages 用ページの動作確認 |
 | `original/` | 作り替える前の元ソース（Cloudflare Workers + D1 版） |
+
+## デモの公開URL（GitHub Pages）
+
+https://k-okada-lang.github.io/customer-note/
+
+- データは、開いた人のブラウザの中（localStorage）にだけ保存されます。ほかの人や端末とは共有されません。
+- 初回に、架空のお客様10名とキャスト・黒服5名が入ります。
+- 画面を変えたら `node build.mjs` を実行して `docs/` を作り直し、コミットして送信すると反映されます。
 
 ## Artifact 上での動作
 

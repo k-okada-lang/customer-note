@@ -335,11 +335,12 @@ img.avatar{object-fit:cover}
 <script src="qr.js"></script>
 <script src="jsqr.js"></script>
 <script>
-const ARTIFACT_URL='https://claude.ai/artifact/QjgFFvBp2u2eHg61jCkUY8';
+const ARTIFACT_URL=window.__standalone?location.origin+location.pathname:'https://claude.ai/artifact/QjgFFvBp2u2eHg61jCkUY8';
+const blobUrl=id=>window.__blobUrl?window.__blobUrl(id):'/_blob/'+id;
 const fields=['name','kana','company','title','postal','address','phone','email','tobacco','status','birthday','features','memo'];
 const labels={kana:'ふりがな',company:'会社名',title:'部署・役職',postal:'郵便番号',address:'住所',phone:'電話番号',email:'メールアドレス',status:'喫煙区分',tobacco:'タバコの銘柄',birthday:'誕生日',features:'特徴',memo:'メモ・お好み'};
 const KEYS={photo:'photo',front:'cardFront',back:'cardBack'};
-const avatar=c=>c.photoThumb?'<img class="avatar" src="/_blob/'+esc(c.photoThumb)+'" alt="">':'<span class="avatar">'+esc(Array.from(c.name||'?')[0])+'</span>';
+const avatar=c=>c.photoThumb?'<img class="avatar" src="'+esc(blobUrl(c.photoThumb))+'" alt="">':'<span class="avatar">'+esc(Array.from(c.name||'?')[0])+'</span>';
 document.addEventListener('error',e=>{if(e.target.tagName==='IMG'&&e.target.classList.contains('avatar'))e.target.style.visibility='hidden'},true);
 let customers=[],staff=[],selected=null,editing=null,db=null,dl=null,assets=null,sample=null,canOcr=false,ready=false,stale=false,noAccess=false,toastTimer=0,shopName='';
 let visitList=[],visitsReady=false,visitUnsub=null,visitFor=null,editingVisit=null,armedStaff='';
@@ -451,7 +452,7 @@ async function shrink(file,max){
 
 /* ---------- お客様の登録・編集 ---------- */
 function cardPreview(side){
-  const key=KEYS[side],img=el(key+'Img'),src=card[side]?card[side].url:(editing?.[key]?'/_blob/'+editing[key]:'');
+  const key=KEYS[side],img=el(key+'Img'),src=card[side]?card[side].url:(editing?.[key]?blobUrl(editing[key]):'');
   if(src){img.src=src;img.hidden=false}else{img.removeAttribute('src');img.hidden=true}
   el(key+'Btn').textContent=src?'写真を変更':'写真を選ぶ';
 }
@@ -587,12 +588,12 @@ function renderDetail(){
   el('detailBody').innerHTML=Object.entries(labels).map(([k,l])=>'<div'+(k==='memo'||k==='features'?' class="wide"':'')+'><dt>'+l+'</dt><dd>'+esc((k==='birthday'?fmtBday(c):c[k])||'—')+'</dd></div>').join('');
   let any=false;
   for(const [key,img] of [['cardFront',el('dCardFront')],['cardBack',el('dCardBack')]]){
-    if(c[key]){if(img.dataset.id!==c[key]){img.dataset.id=c[key];img.src='/_blob/'+c[key]}img.hidden=false;any=true}
+    if(c[key]){if(img.dataset.id!==c[key]){img.dataset.id=c[key];img.src=blobUrl(c[key])}img.hidden=false;any=true}
     else{img.hidden=true;img.dataset.id='';img.removeAttribute('src')}
   }
   el('cardView').hidden=!any;
   const ph=el('dPhoto');
-  if(c.photo){if(ph.dataset.id!==c.photo){ph.dataset.id=c.photo;ph.src='/_blob/'+c.photo}ph.hidden=false}
+  if(c.photo){if(ph.dataset.id!==c.photo){ph.dataset.id=c.photo;ph.src=blobUrl(c.photo)}ph.hidden=false}
   else{ph.hidden=true;ph.dataset.id='';ph.removeAttribute('src')}
   const ref=customers.find(x=>x.id===c.referrerId),kids=customers.filter(x=>x.referrerId===c.id);
   const linkBtn=x=>'<button data-ref="'+esc(x.id)+'">'+esc(x.name)+' 様'+(x.vip?'<span class="badge vip">VIP</span>':'')+'</button>';
@@ -600,7 +601,7 @@ function renderDetail(){
   el('qr').innerHTML=makeQr(c.id).createSvgTag(4,4);
   el('linkText').value=customerLink(c.id);
   el('btnMail').hidden=!c.email;
-  el('qrHelp').innerHTML='スタッフがこのQRコードを読み取ると、お客様情報が開きます。<br>開けるのは、この名簿を共有されたメンバーだけです。';
+  el('qrHelp').innerHTML='スタッフがこのQRコードを読み取ると、お客様情報が開きます。<br>'+(window.__standalone?'このデモでは、データを登録したブラウザでだけ開けます。':'開けるのは、この名簿を共有されたメンバーだけです。');
   renderVisits();
 }
 for(const id of ['dPhoto','dCardFront','dCardBack'])el(id).addEventListener('error',e=>{e.target.hidden=true});

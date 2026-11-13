@@ -1,0 +1,21 @@
+const {chromium}=require('playwright');const fs=require('fs'),http=require('http'),path=require('path');const DIR=process.argv[2];
+const T={'.html':'text/html;charset=utf-8','.js':'text/javascript'};
+const srv=http.createServer((q,r)=>{let u=q.url.split('?')[0];if(u.endsWith('/'))u+='index.html';const f=path.join(DIR,u.replace(/^\/customer-note/,''));if(fs.existsSync(f)&&fs.statSync(f).isFile()){r.writeHead(200,{'content-type':T[path.extname(f)]||'application/octet-stream'});r.end(fs.readFileSync(f))}else{r.writeHead(404);r.end()}});
+(async()=>{await new Promise(r=>srv.listen(0,r));const U='http://localhost:'+srv.address().port+'/customer-note/';const b=await chromium.launch();const errs=[];const out=[];const ok=(n,c,d)=>out.push((c?'PASS ':'FAIL ')+n+(c?'':' → '+d));
+for(const w of [1300,390]){const ctx=await b.newContext({viewport:{width:w,height:900},acceptDownloads:true});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+await p.goto(U);await p.waitForTimeout(600);
+ok(w+' ログイン画面が出る',await p.isVisible('#loginForm'));await p.click('#gSubmit');await p.waitForTimeout(300);
+ok(w+' ホームに来店数2',await p.textContent('#heroCount')==='2',await p.textContent('#heroCount'));
+await p.evaluate(()=>goList(''));await p.waitForTimeout(200);ok(w+' 名簿にサンプル10名',await p.locator('#rows tr').count()===10);
+ok(w+' QRリンクがこのページのURL',await p.evaluate(()=>customerLink('demo-01'))===U+'#c-demo-01',await p.evaluate(()=>customerLink('demo-01')));
+await p.evaluate(()=>checkIn('demo-06'));await p.waitForTimeout(400);
+await p.evaluate(()=>{const cv=document.createElement('canvas');cv.width=1200;cv.height=900;cv.getContext('2d').fillRect(0,0,500,500);edit(customers.find(c=>c.id==='demo-06'));return new Promise(r=>cv.toBlob(bl=>{const dt=new DataTransfer();dt.items.add(new File([bl],'p.png',{type:'image/png'}));const i=document.getElementById('photoFile');i.files=dt.files;i.dispatchEvent(new Event('change'));setTimeout(r,800)}))});
+await p.click('#save');await p.waitForTimeout(800);
+ok(w+' 写真がこのブラウザに保存され表示',await p.evaluate(()=>document.getElementById('dPhoto').src.startsWith('data:image/jpeg')&&!document.getElementById('dPhoto').hidden));
+const [dl]=await Promise.all([p.waitForEvent('download',{timeout:5000}),p.click('#btnCard')]);ok(w+' カード画像がダウンロードされる',!!dl);
+await p.reload();await p.waitForTimeout(600);
+ok(w+' 再読み込み後もログインとデータが残る',await p.isVisible('#mainEl')&&await p.textContent('#heroCount')==='3',await p.textContent('#heroCount'));
+await p.goto(U+'#c-demo-02');await p.reload();await p.waitForTimeout(700);ok(w+' QRのリンクで詳細が開く',await p.isVisible('#detail')&&(await p.textContent('#detailTitle')).includes('鈴木'));
+ok(w+' 横はみ出しなし',await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+if(w===390)await p.screenshot({path:path.join(__dirname,'out-pages-m.png')});await ctx.close()}
+ok('画面エラーなし',errs.filter(e=>!/404|Failed to load/.test(e)).length===0,errs.join('|'));console.log(out.join('\n'));await b.close();srv.close()})();

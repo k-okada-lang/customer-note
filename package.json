@@ -1,1 +1,1 @@
-{"name":"customer-note","private":true,"version":"0.1.0","description":"お客様ノート：QRチェックイン付き顧客管理（デモ版）","scripts":{"test":"node test/run.js ."},"devDependencies":{"playwright":"^1.48.0"}}
+{"name":"customer-note","private":true,"version":"0.1.0","description":"お客様ノート：QRチェックイン付き顧客管理（デモ版）","scripts":{"build":"node build.mjs","test":"node test/run.js . && node build.mjs && node test/smoke.js docs"},"devDependencies":{"playwright":"^1.48.0"}}
