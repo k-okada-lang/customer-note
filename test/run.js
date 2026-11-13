@@ -55,7 +55,7 @@ const ok=(name,cond,detail)=>{res.push({name,pass:!!cond,detail:cond?'':String(d
   const A=await idOf(p,'山田 太郎');
   ok('N04 お客様を登録でき詳細が開く',A&&await p.isVisible('#detail')&&(await p.textContent('#detailTitle')).includes('山田 太郎'));
   ok('N05 詳細にVIP・誕生日・特徴が表示',(await p.innerHTML('#detailTitle')).includes('VIP')&&(await p.textContent('#detailBody')).includes(today.getFullYear()+'年')&&(await p.textContent('#detailBody')).includes('背が高い'));
-  ok('N06 詳細にQRコードが描画',await p.locator('#qr svg').count()===1);
+  ok('N06 詳細にQRコードが描画',await p.locator('#cardBox canvas').count()===1);
   await closeAll(p);
   await reg(p,{name:'佐藤 花子',phone:'080-3333-4444'});const B=await idOf(p,'佐藤 花子');await closeAll(p);
   ok('N07 2人目を登録',!!B);
@@ -108,7 +108,18 @@ const ok=(name,cond,detail)=>{res.push({name,pass:!!cond,detail:cond?'':String(d
   await p.click('#btnCsv');await W(p);const csv=await p.evaluate(()=>__saved.at(-1));
   ok('N30 CSV出力（BOM・見出し・2名）',csv.filename.endsWith('.csv')&&csv.data.charCodeAt(0)===0xFEFF&&csv.data.includes('お名前')&&csv.data.includes('紹介者')&&csv.data.split('\r\n').length===3,csv.filename);
   await p.click('#btnPrint');await W(p);const pr=await p.evaluate(()=>__saved.at(-1));
-  ok('N31 QRカード印刷用ファイル（2名分）',pr.filename.endsWith('.html')&&(pr.data.match(/class="card"/g)||[]).length===2);
+  ok('N31 QRカード印刷用ファイル（2名分・カード画像入り）',pr.filename.endsWith('.html')&&(pr.data.match(/class="card"/g)||[]).length===2&&(pr.data.match(/data:image\/jpeg/g)||[]).length===2);
+  await p.evaluate(a=>show(a),A);await W(p,400);await p.click('#btnQrOnly');await W(p,400);
+  const qo=await p.evaluate(async a=>{const b=await qrOnlyBlob(customers.find(c=>c.id===a));return{t:await decodeFile(b),l:customerLink(a),f:__saved.at(-1).filename}},A);
+  ok('N31b QRコードのみ保存（読み取ると同じリンク）',qo.f.startsWith('QR_')&&qo.f.endsWith('.png')&&qo.t===qo.l,JSON.stringify(qo));await closeAll(p);
+  const rj=await p.evaluate(()=>[['なかむら かいと','Kaito Nakamura'],['さとう けんいち','Kenichi Sato'],['たかはし しょうた','Shota Takahashi'],['いのうえ ゆうこ','Yuko Inoue'],['おおの りょう','Ryo Ono'],['ハットリ ジュン','Jun Hattori'],['',''],['山田','']].map(([k,e])=>[k,toRomaji(k),e]).filter(x=>x[1]!==x[2]));
+  ok('N31c ふりがなからローマ字を自動作成',rj.length===0,JSON.stringify(rj));
+  const all10=await p.evaluate(async a=>{const c=customers.find(c=>c.id===a),bad=[];for(let i=0;i<DESIGNS.length;i++){const cv=await cardCanvas(c,i),b=await canvasBlob(cv);if(await decodeFile(b)!==customerLink(a))bad.push(i+1)}return bad},A);
+  ok('N31d 10デザインすべてでQRが読み取れる',all10.length===0,'読めないデザイン: '+all10.join(','));
+  await p.evaluate(()=>openAdmins());await W(p,1500);
+  ok('N31e 管理者設定に10デザインが並ぶ',await p.locator('#designGrid [data-design]').count()===10&&await p.locator('#designGrid .on').count()===1);
+  await p.click('#designGrid [data-design="5"]');await W(p,400);
+  ok('N31f デザインを選ぶと保存され選択状態になる',await p.evaluate(()=>__store()['settings/card'].design===5&&cardDesign===5)&&await p.getAttribute('#designGrid .on','data-design')==='5');await closeAll(p);
   await p.evaluate(a=>show(a),A);await W(p,300);await p.click('#btnCard');await W(p,600);
   ok('N32 カード画像を保存',(await p.evaluate(()=>__saved.at(-1))).filename.endsWith('.png'));await closeAll(p);
   await p.click('#navHistory');await W(p,500);
@@ -238,7 +249,7 @@ const ok=(name,cond,detail)=>{res.push({name,pass:!!cond,detail:cond?'':String(d
   ok('E53 旧形式の来店記録を開くと未入力2件として引き継ぐ',await visitsOf(p,'x-leg')===2&&await p.evaluate(()=>{const c=customers.find(c=>c.id==='x-leg');return c.visitCount===2&&c.pending===2&&c.visits.length===0}));await closeAll(p);
   await p.evaluate(()=>{const img=document.createElement('canvas');img.width=2400;img.height=1600;img.getContext('2d').fillRect(0,0,100,100);edit();return new Promise(r=>img.toBlob(b=>{const dt=new DataTransfer();dt.items.add(new File([b],'p.png',{type:'image/png'}));const i=document.getElementById('photoFile');i.files=dt.files;i.dispatchEvent(new Event('change'));setTimeout(r,800)}))});
   ok('E54 写真を選ぶとプレビュー表示',await p.isVisible('#photoImg'));
-  await p.fill('#f-name','写真 あり');await p.click('#save');await W(p,600);
+  await p.fill('#f-name','写真 あり');await p.click('#save');await W(p,1500);
   ok('E55 写真と小さい写真の両方が保存される',await p.evaluate(()=>{const c=customers.find(c=>c.name==='写真 あり');return !!c.photo&&!!c.photoThumb&&c.photo!==c.photoThumb}));await closeAll(p);
   await p.evaluate(()=>{window.__failUpload=true;const img=document.createElement('canvas');img.width=50;img.height=50;edit();return new Promise(r=>img.toBlob(b=>{const dt=new DataTransfer();dt.items.add(new File([b],'p.png',{type:'image/png'}));const i=document.getElementById('cardFrontFile');i.files=dt.files;i.dispatchEvent(new Event('change'));setTimeout(r,600)}))});
   await p.fill('#f-name','写真 失敗');await p.click('#save');await W(p,600);
@@ -289,4 +300,4 @@ const ok=(name,cond,detail)=>{res.push({name,pass:!!cond,detail:cond?'':String(d
   const fail=res.filter(r=>!r.pass);
   for(const r of res)console.log((r.pass?'PASS ':'FAIL ')+r.name+(r.pass?'':'  → '+r.detail.slice(0,300)));
   console.log('\nTOTAL',res.length,'PASS',res.length-fail.length,'FAIL',fail.length);
-})().catch(e=>{console.log('HARNESS ERROR',e.stack);process.exit(1)});
+})().catch(e=>{for(const r of res)if(!r.pass)console.log('FAIL '+r.name+' → '+r.detail.slice(0,300));console.log('last ok:',res.at(-1)?.name);console.log('ERRS',errs.join(' | '));console.log('HARNESS ERROR',e.stack.split('\n').slice(0,3).join(' '));process.exit(1)});

@@ -7,7 +7,7 @@
 <style>:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>お客様ノート</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600&family=Great+Vibes&display=swap">
 <style>
 /* Layout: fixed left rail (brand + nav), main column with stat row, one list panel; rail folds to a top bar on phones. */
 :root{
@@ -238,7 +238,12 @@ textarea{min-height:85px;resize:vertical}
 .detail-grid dt{color:var(--muted);font-size:11px;margin-bottom:6px}
 .detail-grid dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 .qrbox{text-align:center;background:var(--surface2);padding:22px;margin-top:22px;border-radius:10px}
-.qrbox svg{max-width:180px;height:auto;background:#fff;padding:12px;border-radius:6px}
+.cardbox{min-height:60px}
+.cardbox canvas{display:block;width:100%;height:auto;border-radius:8px}
+.designgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dbtn{display:grid;gap:6px;padding:6px;font-size:11px;text-align:center;min-width:0}
+.dbtn canvas{display:block;width:100%;height:auto;border-radius:6px}
+.dbtn.on{border-color:var(--accent);outline:2px solid var(--accent);font-weight:700;color:var(--accent)}
 .qrbox p{font-size:11px;margin:10px 0}
 .qrbox input{width:100%;font-size:11px;text-align:center;margin-bottom:10px}
 .qrbox h3{margin:20px 0 4px}
@@ -315,14 +320,14 @@ img.avatar{object-fit:cover}
 
 <dialog id="editor"><form id="form" novalidate><div class="dialog-head"><h2 id="editTitle">お客様を登録</h2><button type="button" id="editClose" aria-label="閉じる">×</button></div><input type="hidden" name="id" id="f-id">
 <div id="cardSection" hidden><div class="cards"><div class="cardslot" id="photoSlot"><span>お客様の写真</span><img id="photoImg" alt="お客様の写真" hidden><button type="button" id="photoCamBtn">カメラで撮影</button><input type="file" id="photoCamFile" accept="image/*" capture="environment" hidden><button type="button" id="photoBtn">写真を選ぶ</button><input type="file" id="photoFile" accept="image/*" hidden></div><div class="cardslot"><span>名刺（表）</span><img id="cardFrontImg" alt="名刺（表）" hidden><button type="button" id="cardFrontCamBtn">カメラで撮影</button><input type="file" id="cardFrontCamFile" accept="image/*" capture="environment" hidden><button type="button" id="cardFrontBtn">写真を選ぶ</button><input type="file" id="cardFrontFile" accept="image/*" hidden></div><div class="cardslot"><span>名刺（裏）</span><img id="cardBackImg" alt="名刺（裏）" hidden><button type="button" id="cardBackCamBtn">カメラで撮影</button><input type="file" id="cardBackCamFile" accept="image/*" capture="environment" hidden><button type="button" id="cardBackBtn">写真を選ぶ</button><input type="file" id="cardBackFile" accept="image/*" hidden></div></div><div class="btnrow" style="justify-content:flex-start;margin-top:12px"><button type="button" class="primary" id="btnOcr" hidden>名刺から自動入力</button></div><p class="note" id="ocrStatus" role="status" style="margin:8px 0 18px"></p></div>
-<div class="formgrid"><label>お名前 <span class="req">必須</span><input name="name" id="f-name" maxlength="100" placeholder="山田 太郎"></label><label>ふりがな<input name="kana" id="f-kana" placeholder="やまだ たろう" maxlength="100"></label><label>会社名<input name="company" id="f-company" placeholder="株式会社〇〇" maxlength="200"></label><label>部署・役職<input name="title" id="f-title" placeholder="営業部 部長" maxlength="200"></label><label>郵便番号<input name="postal" id="f-postal" placeholder="123-4567" maxlength="20"></label><label>電話番号<input name="phone" id="f-phone" type="tel" placeholder="090-1234-5678" maxlength="50"></label><label class="wide">住所<input name="address" id="f-address" placeholder="都道府県・市区町村・番地・建物名" maxlength="500"></label><label class="wide">メールアドレス<input name="email" id="f-email" type="email" placeholder="name@example.com" maxlength="200"></label><label>喫煙区分<select name="status" id="f-status"><option>未確認</option><option>喫煙</option><option>禁煙</option></select></label><label>タバコの銘柄・種類<input name="tobacco" id="f-tobacco" placeholder="例：メビウス 10mg" maxlength="200"></label><label>誕生日<input type="date" name="birthday" id="f-birthday"></label><label>紹介者（名簿から選ぶ）<select name="referrerId" id="f-referrerId"></select></label><label>紹介者（名簿にない場合）<input name="referrerName" id="f-referrerName" maxlength="100" placeholder="例：田中 様"></label><label class="chip wide" style="justify-self:start"><input type="checkbox" name="vip" id="f-vip">VIPとして登録</label><label class="wide">特徴<textarea name="features" id="f-features" maxlength="500" placeholder="見た目・雰囲気・話し方など、お顔を思い出す手がかり" style="min-height:60px"></textarea></label><label class="wide">メモ・お好み<textarea name="memo" id="f-memo" placeholder="接客時のメモや、お客様のお好みなど" maxlength="4000"></textarea></label></div><p id="formError" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="editCancel">キャンセル</button><button class="primary" id="save">保存する</button></div></form></dialog>
+<div class="formgrid"><label>お名前 <span class="req">必須</span><input name="name" id="f-name" maxlength="100" placeholder="山田 太郎"></label><label>ふりがな<input name="kana" id="f-kana" placeholder="やまだ たろう" maxlength="100"></label><label class="wide">ローマ字（カードに表示）<input name="romaji" id="f-romaji" placeholder="空欄なら、ふりがなから自動で作ります（例：Taro Yamada）" maxlength="100"></label><label>会社名<input name="company" id="f-company" placeholder="株式会社〇〇" maxlength="200"></label><label>部署・役職<input name="title" id="f-title" placeholder="営業部 部長" maxlength="200"></label><label>郵便番号<input name="postal" id="f-postal" placeholder="123-4567" maxlength="20"></label><label>電話番号<input name="phone" id="f-phone" type="tel" placeholder="090-1234-5678" maxlength="50"></label><label class="wide">住所<input name="address" id="f-address" placeholder="都道府県・市区町村・番地・建物名" maxlength="500"></label><label class="wide">メールアドレス<input name="email" id="f-email" type="email" placeholder="name@example.com" maxlength="200"></label><label>喫煙区分<select name="status" id="f-status"><option>未確認</option><option>喫煙</option><option>禁煙</option></select></label><label>タバコの銘柄・種類<input name="tobacco" id="f-tobacco" placeholder="例：メビウス 10mg" maxlength="200"></label><label>誕生日<input type="date" name="birthday" id="f-birthday"></label><label>紹介者（名簿から選ぶ）<select name="referrerId" id="f-referrerId"></select></label><label>紹介者（名簿にない場合）<input name="referrerName" id="f-referrerName" maxlength="100" placeholder="例：田中 様"></label><label class="chip wide" style="justify-self:start"><input type="checkbox" name="vip" id="f-vip">VIPとして登録</label><label class="wide">特徴<textarea name="features" id="f-features" maxlength="500" placeholder="見た目・雰囲気・話し方など、お顔を思い出す手がかり" style="min-height:60px"></textarea></label><label class="wide">メモ・お好み<textarea name="memo" id="f-memo" placeholder="接客時のメモや、お客様のお好みなど" maxlength="4000"></textarea></label></div><p id="formError" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="editCancel">キャンセル</button><button class="primary" id="save">保存する</button></div></form></dialog>
 
 <dialog id="detail"><div class="dialog-head"><h2 id="detailTitle"></h2><button id="detailX" aria-label="閉じる">×</button></div>
 <img id="dPhoto" class="dphoto" alt="お客様の写真" hidden><div class="visit"><div><b id="visitCount"></b><small id="visitLast"></small></div><button class="link" id="btnVisitPast">過去の来店を追加</button><button class="primary" id="btnVisit">チェックイン</button></div>
 <h3>来店履歴</h3><div id="visitList" class="vlist"></div>
 <h3>お客様情報</h3><dl id="detailBody" class="detail-grid"></dl><div id="refBox"></div>
 <div class="cardview" id="cardView" hidden><img id="dCardFront" alt="名刺（表）" hidden><img id="dCardBack" alt="名刺（裏）" hidden></div>
-<div class="qrbox"><div id="qr"></div><p id="qrHelp"></p><h3>お客様に渡す</h3><p>カード画像を保存して、LINEやメールに添付して送れます。画像はそのまま印刷もできます。</p><div class="btnrow"><button class="primary" id="btnCard" hidden>カード画像を保存</button><button id="btnMsg">案内文をコピー</button><button id="btnMail" hidden>メールアドレスをコピー</button><button id="btnPrintOne" hidden>印刷用ファイルを保存</button></div><h3>スタッフ用リンク</h3><input id="linkText" readonly aria-label="リンクまたは顧客ID"><div class="btnrow"><button id="btnCopy">リンクをコピー</button></div></div>
+<div class="qrbox"><div id="cardBox" class="cardbox"></div><p id="qrHelp"></p><h3>お客様に渡す</h3><p>カード画像を保存して、LINEやメールに添付して送れます。画像はそのまま印刷もできます。</p><div class="btnrow"><button class="primary" id="btnCard" hidden>カード画像を保存</button><button id="btnQrOnly" hidden>QRコードのみ保存</button><button id="btnMsg">案内文をコピー</button><button id="btnMail" hidden>メールアドレスをコピー</button><button id="btnPrintOne" hidden>印刷用ファイルを保存</button></div><h3>スタッフ用リンク</h3><input id="linkText" readonly aria-label="リンクまたは顧客ID"><div class="btnrow"><button id="btnCopy">リンクをコピー</button></div></div>
 <div class="dialog-actions" id="detailActions"><button class="danger" id="btnDel">削除</button><button id="detailClose">閉じる</button><button class="primary" id="btnEdit">編集する</button></div><div class="dialog-actions" id="delConfirm" hidden><p id="delText"></p><button id="delNo">やめる</button><button class="danger-fill" id="delYes">削除する</button></div></dialog>
 
 <dialog id="vdlg"><form id="vForm" novalidate><div class="dialog-head"><h2 id="vTitle">来店を記録</h2><button type="button" id="vX" aria-label="閉じる">×</button></div>
@@ -336,7 +341,7 @@ img.avatar{object-fit:cover}
 <p class="note" style="margin-top:16px">削除しても、過去の来店記録に残した担当者名は消えません。</p>
 <div class="dialog-actions"><button id="staffClose">閉じる</button></div></dialog>
 
-<dialog id="adminDlg"><div class="dialog-head"><h2>管理者</h2><button id="adminX" aria-label="閉じる">×</button></div><ul id="adminList" class="stafflist"></ul><h3>管理者を追加</h3><form id="adminForm" novalidate class="formgrid"><label>お名前<input id="aName" maxlength="40" autocomplete="off"></label><label>ログインID（半角英数字）<input id="aId" maxlength="40" autocapitalize="none" autocomplete="off"></label><label class="wide">パスワード（6文字以上）<input id="aPw" type="password" maxlength="100" autocomplete="new-password"></label><p class="error wide" id="aError" role="alert" style="margin:0"></p><div class="wide"><button class="primary" id="aAdd">追加する</button></div></form><div class="dialog-actions"><button id="adminClose">閉じる</button></div></dialog>
+<dialog id="adminDlg"><div class="dialog-head"><h2>管理者設定</h2><button id="adminX" aria-label="閉じる">×</button></div><h3 style="margin-top:0">QRカードのデザイン</h3><p class="note" style="margin-bottom:12px">選んだデザインが、お客様のページのカード・保存する画像・印刷用ファイルに使われます。</p><div id="designGrid" class="designgrid"></div><h3>管理者</h3><ul id="adminList" class="stafflist"></ul><h3>管理者を追加</h3><form id="adminForm" novalidate class="formgrid"><label>お名前<input id="aName" maxlength="40" autocomplete="off"></label><label>ログインID（半角英数字）<input id="aId" maxlength="40" autocapitalize="none" autocomplete="off"></label><label class="wide">パスワード（6文字以上）<input id="aPw" type="password" maxlength="100" autocomplete="new-password"></label><p class="error wide" id="aError" role="alert" style="margin:0"></p><div class="wide"><button class="primary" id="aAdd">追加する</button></div></form><div class="dialog-actions"><button id="adminClose">閉じる</button></div></dialog>
 
 <dialog id="scanner"><div class="dialog-head"><h2>QRコードを読み取る</h2><button id="scanX" aria-label="閉じる">×</button></div><p>お客様のQRコードを撮影すると、本日のご来店にチェックインし、来店履歴と詳細が開きます。スクリーンショットなどの画像からも読み取れます。</p><div class="btnrow" style="justify-content:flex-start;margin-top:16px"><button class="primary" id="scanCam">カメラで撮影して読み取る</button><button id="scanPick">画像から読み取る</button></div><input type="file" id="scanCamFile" accept="image/*" capture="environment" hidden><input type="file" id="scanPickFile" accept="image/*" hidden><label style="margin-top:20px">顧客ID または QRコードのリンク<input id="scanInput" placeholder="リンク・顧客IDを貼り付け"></label><p class="error" id="scanError" role="alert"></p><div class="dialog-actions"><button class="primary" id="scanGo">お客様を開く</button></div></dialog>
 
@@ -347,8 +352,8 @@ img.avatar{object-fit:cover}
 <script>
 const ARTIFACT_URL=window.__standalone?location.origin+location.pathname:'https://claude.ai/artifact/QjgFFvBp2u2eHg61jCkUY8';
 const blobUrl=id=>window.__blobUrl?window.__blobUrl(id):'/_blob/'+id;
-const fields=['name','kana','company','title','postal','address','phone','email','tobacco','status','birthday','features','memo'];
-const labels={kana:'ふりがな',company:'会社名',title:'部署・役職',postal:'郵便番号',address:'住所',phone:'電話番号',email:'メールアドレス',status:'喫煙区分',tobacco:'タバコの銘柄',birthday:'誕生日',features:'特徴',memo:'メモ・お好み'};
+const fields=['name','kana','romaji','company','title','postal','address','phone','email','tobacco','status','birthday','features','memo'];
+const labels={kana:'ふりがな',romaji:'ローマ字',company:'会社名',title:'部署・役職',postal:'郵便番号',address:'住所',phone:'電話番号',email:'メールアドレス',status:'喫煙区分',tobacco:'タバコの銘柄',birthday:'誕生日',features:'特徴',memo:'メモ・お好み'};
 const KEYS={photo:'photo',front:'cardFront',back:'cardBack'};
 const avatar=c=>c.photoThumb?'<img class="avatar" src="'+esc(blobUrl(c.photoThumb))+'" alt="">':'<span class="avatar">'+esc(Array.from(c.name||'?')[0])+'</span>';
 document.addEventListener('error',e=>{if(e.target.tagName==='IMG'&&e.target.classList.contains('avatar'))e.target.style.visibility='hidden'},true);
@@ -595,7 +600,7 @@ async function syncSummary(id){
 function renderDetail(){
   const c=selected;
   el('detailTitle').innerHTML=esc(c.name)+' 様'+(c.vip?'<span class="badge vip">VIP</span>':'');
-  el('detailBody').innerHTML=Object.entries(labels).map(([k,l])=>'<div'+(k==='memo'||k==='features'?' class="wide"':'')+'><dt>'+l+'</dt><dd>'+esc((k==='birthday'?fmtBday(c):c[k])||'—')+'</dd></div>').join('');
+  el('detailBody').innerHTML=Object.entries(labels).map(([k,l])=>'<div'+(k==='memo'||k==='features'?' class="wide"':'')+'><dt>'+l+'</dt><dd>'+esc((k==='birthday'?fmtBday(c):k==='romaji'?romajiOf(c):c[k])||'—')+'</dd></div>').join('');
   let any=false;
   for(const [key,img] of [['cardFront',el('dCardFront')],['cardBack',el('dCardBack')]]){
     if(c[key]){if(img.dataset.id!==c[key]){img.dataset.id=c[key];img.src=blobUrl(c[key])}img.hidden=false;any=true}
@@ -608,7 +613,7 @@ function renderDetail(){
   const ref=customers.find(x=>x.id===c.referrerId),kids=customers.filter(x=>x.referrerId===c.id);
   const linkBtn=x=>'<button data-ref="'+esc(x.id)+'">'+esc(x.name)+' 様'+(x.vip?'<span class="badge vip">VIP</span>':'')+'</button>';
   el('refBox').innerHTML='<h3>紹介者</h3><div class="btnrow left">'+(ref?linkBtn(ref):'<span class="note">'+esc(c.referrerName||'—')+'</span>')+'</div>'+(kids.length?'<h3>紹介したお客様（'+kids.length+'名）</h3><div class="btnrow left">'+kids.map(linkBtn).join('')+'</div>':'');
-  el('qr').innerHTML=makeQr(c.id).createSvgTag(4,4);
+  renderCardBox();
   el('linkText').value=customerLink(c.id);
   el('btnMail').hidden=!c.email;
   el('qrHelp').innerHTML='スタッフがこのQRコードを読み取ると、お客様情報が開きます。<br>'+(window.__standalone?'このデモでは、データを登録したブラウザでだけ開けます。':'開けるのは、この名簿を共有されたメンバーだけです。');
@@ -732,32 +737,192 @@ window.addEventListener('hashchange',openHash);
 detail.addEventListener('close',()=>{if(visitUnsub){visitUnsub();visitUnsub=null}visitFor=null;visitList=[];visitsReady=false;if(location.hash)location.hash=''});
 
 /* ---------- QRカード・印刷・送付 ---------- */
-async function cardBlob(c){
-  const W=1000,H=1400,cv=document.createElement('canvas'),x=cv.getContext('2d'),ff='"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif',title=shopName||'お客様ノート';
-  cv.width=W;cv.height=H;
-  try{await document.fonts.load('700 60px "Noto Sans JP"',c.name+title+'様会員カードご来店の際に、このQRコードをスタッフにご提示ください。')}catch{}
-  const fit=(t,size,weight)=>{x.font=weight+' '+size+'px '+ff;while(x.measureText(t).width>W-120&&size>22){size-=2;x.font=weight+' '+size+'px '+ff}};
-  x.fillStyle='#ffffff';x.fillRect(0,0,W,H);x.fillStyle='#176b58';x.fillRect(0,0,W,210);
-  x.textAlign='center';x.textBaseline='middle';
-  x.fillStyle='#ffffff';fit(title,64,700);x.fillText(title,W/2,105);
-  x.fillStyle='#193e38';fit(c.name+' 様',76,700);x.fillText(c.name+' 様',W/2,325);
-  x.fillStyle='#6f827a';x.font='400 34px '+ff;x.fillText('会員QRカード',W/2,410);
-  const code=makeQr(c.id),n=code.getModuleCount(),cell=Math.floor(720/(n+8)),ox=Math.floor((W-cell*n)/2),oy=490+cell*4;
-  x.fillStyle='#000000';
-  for(let r=0;r<n;r++)for(let q=0;q<n;q++)if(code.isDark(r,q))x.fillRect(ox+q*cell,oy+r*cell,cell,cell);
-  x.fillStyle='#193e38';x.font='500 36px '+ff;
-  x.fillText('ご来店の際に、このQRコードを',W/2,1265);x.fillText('スタッフにご提示ください。',W/2,1320);
-  return new Promise(res=>cv.toBlob(res,'image/png'));
+/* ---------- QRカードのデザイン（10種類） ---------- */
+let cardDesign=0,cardKey='';
+const KANA={あ:'a',い:'i',う:'u',え:'e',お:'o',か:'ka',き:'ki',く:'ku',け:'ke',こ:'ko',さ:'sa',し:'shi',す:'su',せ:'se',そ:'so',た:'ta',ち:'chi',つ:'tsu',て:'te',と:'to',な:'na',に:'ni',ぬ:'nu',ね:'ne',の:'no',は:'ha',ひ:'hi',ふ:'fu',へ:'he',ほ:'ho',ま:'ma',み:'mi',む:'mu',め:'me',も:'mo',や:'ya',ゆ:'yu',よ:'yo',ら:'ra',り:'ri',る:'ru',れ:'re',ろ:'ro',わ:'wa',を:'o',ん:'n',が:'ga',ぎ:'gi',ぐ:'gu',げ:'ge',ご:'go',ざ:'za',じ:'ji',ず:'zu',ぜ:'ze',ぞ:'zo',だ:'da',ぢ:'ji',づ:'zu',で:'de',ど:'do',ば:'ba',び:'bi',ぶ:'bu',べ:'be',ぼ:'bo',ぱ:'pa',ぴ:'pi',ぷ:'pu',ぺ:'pe',ぽ:'po',ー:''};
+function toRomaji(kana){
+  const words=String(kana||'').trim().replace(/[ァ-ヶ]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0x60)).split(/[\s　]+/).filter(Boolean).map(w=>{
+    let out='';
+    for(let i=0;i<w.length;i++){
+      const ch=w[i],nx=w[i+1];
+      if(ch==='っ'){const r=KANA[nx]||'';out+=r?(r.startsWith('ch')?'t':r[0]):'';continue}
+      if(nx&&'ゃゅょ'.includes(nx)&&KANA[ch]&&KANA[ch].endsWith('i')){const b=KANA[ch];out+=(/^(shi|chi|ji)$/.test(b)?b.slice(0,-1):b.slice(0,-1)+'y')+{ゃ:'a',ゅ:'u',ょ:'o'}[nx];i++;continue}
+      if(KANA[ch]==null)return '';
+      out+=KANA[ch];
+    }
+    out=out.replace(/ou(?![aiueo])/g,'o').replace(/oo(?![aiueo])/g,'o').replace(/uu/g,'u');
+    return out?out[0].toUpperCase()+out.slice(1):'';
+  });
+  if(!words.length||words.some(w=>!w))return '';
+  return (words.length===2?[words[1],words[0]]:words).join(' ');
 }
-function printHtml(list){
-  const cards=list.map(c=>'<div class="card">'+makeQr(c.id).createSvgTag({cellSize:4,margin:16,scalable:true})+'<div><small>'+esc(shopName||'会員QRカード')+'</small><b>'+esc(c.name)+' 様</b><p>ご来店の際に、このQRコードを<br>スタッフにご提示ください。</p></div></div>').join('');
-  return '<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QRカード印刷</title><style>@page{size:A4;margin:10mm}body{margin:0;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;color:#111;background:#fff}.bar{padding:14px;font-size:14px;background:#eef4ea}.bar button{font:inherit;padding:8px 18px;margin-right:10px}.sheet{display:grid;grid-template-columns:1fr 1fr}.card{height:66mm;border:1px dashed #999;padding:5mm;display:flex;gap:5mm;align-items:center;break-inside:avoid;overflow:hidden}.card svg{width:44mm;height:44mm;flex:none}.card small{display:block;font-size:9pt;color:#555}.card b{display:block;font-size:14pt;margin:2mm 0;overflow-wrap:anywhere}.card p{font-size:8pt;margin:0;color:#333;line-height:1.6}@media print{.bar{display:none}}</style><div class="bar"><button onclick="window.print()">印刷する</button>A4用紙1枚に8名分です。点線に沿って切ってお使いください。</div><div class="sheet">'+cards+'</div></html>';
+const romajiOf=c=>String(c.romaji||'').trim()||toRomaji(c.kana);
+const rng=seed=>()=>{seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const CW=1800,CH=480,GOLD='#d9b565';
+const P={
+  grad(x,a,b){const g=x.createLinearGradient(0,0,CW,CH);g.addColorStop(0,a);g.addColorStop(1,b);x.fillStyle=g;x.fillRect(0,0,CW,CH)},
+  swirl(x,color,seed){
+    const r=rng(seed);x.save();x.lineCap='round';
+    for(let i=0;i<7;i++){const g=x.createLinearGradient(0,0,760,CH);g.addColorStop(0,color);g.addColorStop(1,'rgba(255,255,255,0)');x.strokeStyle=g;x.globalAlpha=.25+r()*.55;x.lineWidth=2+r()*26;x.beginPath();x.moveTo(-60,CH*(.1+r()*.9));x.bezierCurveTo(200+r()*200,-80+r()*200,100+r()*300,CH+60-r()*200,520+r()*320,CH+40);x.stroke()}
+    x.fillStyle=color;for(let i=0;i<140;i++){x.globalAlpha=r()*.8;x.beginPath();x.arc(r()*760,r()*CH,r()*3,0,7);x.fill()}
+    x.restore();
+  },
+  veins(x,color,seed,n){
+    const r=rng(seed);x.save();x.strokeStyle=color;x.lineCap='round';x.lineJoin='round';
+    for(let i=0;i<n;i++){let px=r()*CW,py=r()<.5?-20:CH+20;const dir=py<0?1:-1,drift=(r()-.5)*90;x.globalAlpha=.18+r()*.4;x.lineWidth=.8+r()*2.6;x.beginPath();x.moveTo(px,py);for(let k=0;k<9;k++){const nx=px+drift+(r()-.5)*70,ny=py+dir*(40+r()*40);x.quadraticCurveTo(px+(r()-.5)*40,(py+ny)/2,nx,ny);px=nx;py=ny}x.stroke()}
+    x.restore();
+  },
+  bokeh(x,colors,seed){
+    const r=rng(seed);x.save();
+    for(let i=0;i<40;i++){const cx=r()*CW*.62,cy=r()*CH,rad=14+r()*64,g=x.createRadialGradient(cx,cy,0,cx,cy,rad);g.addColorStop(0,colors[i%colors.length]);g.addColorStop(1,'rgba(255,255,255,0)');x.globalAlpha=.15+r()*.4;x.fillStyle=g;x.beginPath();x.arc(cx,cy,rad,0,7);x.fill()}
+    x.restore();
+  },
+  rose(x,cx,cy,rad,c1,c2){
+    x.save();x.strokeStyle='rgba(0,0,0,.18)';x.lineWidth=2;
+    for(let i=7;i>0;i--){const rr=rad*i/7,a=i*1.9;x.fillStyle=i%2?c1:c2;x.beginPath();x.ellipse(cx+Math.cos(a)*rr*.12,cy+Math.sin(a)*rr*.12,rr,rr*.86,a,0,7);x.fill();x.stroke()}
+    x.restore();
+  },
+  flower(x,cx,cy,rad,c1,c2){
+    x.save();x.translate(cx,cy);
+    for(let i=0;i<6;i++){x.rotate(Math.PI/3);const g=x.createLinearGradient(0,0,0,-rad);g.addColorStop(0,c2);g.addColorStop(1,c1);x.fillStyle=g;x.globalAlpha=.92;x.beginPath();x.moveTo(0,0);x.quadraticCurveTo(rad*.42,-rad*.5,0,-rad);x.quadraticCurveTo(-rad*.42,-rad*.5,0,0);x.fill()}
+    x.globalAlpha=1;x.fillStyle='#f4d27a';x.beginPath();x.arc(0,0,rad*.1,0,7);x.fill();x.restore();
+  },
+  rays(x,color,cx,cy,seed){
+    const r=rng(seed);x.save();x.strokeStyle=color;
+    for(let i=0;i<60;i++){const a=r()*Math.PI*2,l=120+r()*520;x.globalAlpha=.08+r()*.3;x.lineWidth=1+r()*3;x.beginPath();x.moveTo(cx,cy);x.quadraticCurveTo(cx+Math.cos(a+.3)*l*.5,cy+Math.sin(a+.3)*l*.5,cx+Math.cos(a)*l,cy+Math.sin(a)*l);x.stroke()}
+    x.restore();
+  },
+  pearls(x,seed){
+    const r=rng(seed);x.save();
+    for(let i=0;i<46;i++){const cx=r()*210+(r()<.25?r()*130:0),cy=r()*CH,rad=10+r()*24,g=x.createRadialGradient(cx-rad*.3,cy-rad*.3,rad*.1,cx,cy,rad);g.addColorStop(0,'#ffffff');g.addColorStop(.6,'#efe8dc');g.addColorStop(1,'#c9bda8');x.fillStyle=g;x.beginPath();x.arc(cx,cy,rad,0,7);x.fill()}
+    x.restore();
+  },
+  skyline(x,seed){
+    const r=rng(seed),base=CH*.8;x.save();
+    for(let i=0;i<34;i++){
+      const w=24+r()*46,h=30+r()*95,bx=i*26+r()*10-20;x.globalAlpha=1;x.fillStyle='#070b1f';x.fillRect(bx,base-h,w,h);x.fillStyle='#ffd98a';
+      for(let k=0;k<h*w/800;k++){x.globalAlpha=.4+r()*.6;x.fillRect(bx+3+Math.floor(r()*(w-8)/7)*7,base-h+5+Math.floor(r()*(h-10)/9)*9,3,4)}
+    }
+    x.globalAlpha=1;x.strokeStyle='#ffb347';x.lineWidth=5;x.lineJoin='round';x.beginPath();x.moveTo(80,base);x.lineTo(115,base-230);x.lineTo(120,base-300);x.lineTo(125,base-230);x.lineTo(160,base);x.stroke();
+    x.lineWidth=3;for(let k=1;k<6;k++){const yy=base-k*42,hw=40-k*6.2;x.beginPath();x.moveTo(120-hw,yy);x.lineTo(120+hw,yy);x.stroke()}
+    const g=x.createLinearGradient(0,base,0,CH);g.addColorStop(0,'rgba(255,200,120,.35)');g.addColorStop(1,'rgba(10,16,48,0)');x.fillStyle=g;x.fillRect(0,base,900,CH-base);
+    x.fillStyle='#ffd98a';for(let i=0;i<70;i++){x.globalAlpha=r()*.5;x.fillRect(r()*880,base+4+r()*(CH-base-8),8+r()*30,2)}
+    x.restore();
+  },
+  petals(x,color,seed){
+    const r=rng(seed);x.save();x.fillStyle=color;
+    for(let i=0;i<26;i++){x.globalAlpha=.5+r()*.5;x.beginPath();x.ellipse(200+r()*650,r()*CH,6+r()*12,3+r()*6,r()*3,0,7);x.fill()}
+    x.restore();
+  },
+  crown(x,cx,cy,s,color){
+    x.save();x.translate(cx,cy);x.fillStyle=color;x.beginPath();x.moveTo(-s,s*.5);x.lineTo(-s*1.15,-s*.35);x.lineTo(-s*.5,s*.05);x.lineTo(0,-s*.75);x.lineTo(s*.5,s*.05);x.lineTo(s*1.15,-s*.35);x.lineTo(s,s*.5);x.closePath();x.fill();x.fillRect(-s,s*.6,s*2,s*.18);
+    for(const [px,py] of [[-s*1.15,-s*.35],[0,-s*.75],[s*1.15,-s*.35]]){x.beginPath();x.arc(px,py-s*.08,s*.12,0,7);x.fill()}
+    x.restore();
+  }
+};
+const DESIGNS=[
+  {name:'ブラック×ゴールド',ink:'#ffffff',sub:GOLD,nameC:'#ffffff',crown:1,paint:x=>{P.grad(x,'#050505','#1b1508');P.swirl(x,'#e6c36a',11)}},
+  {name:'ホワイトマーブル',ink:'#2a2622',sub:'#9a7b35',nameC:'#2a2622',script:1,paint:x=>{P.grad(x,'#fdfbf6','#efe7d9');P.veins(x,'#c9a24e',22,12);P.veins(x,'#b9b0a2',23,8)}},
+  {name:'パープルナイト',ink:'#ffffff',sub:GOLD,nameC:'#ffffff',paint:x=>{P.grad(x,'#14062a','#3c1260');P.bokeh(x,['#f6d27a','#ff9bd2','#b98cff'],33)}},
+  {name:'エメラルドマーブル',ink:'#f3ead2',sub:GOLD,nameC:'#f1dc9c',crown:1,paint:x=>{P.grad(x,'#07140f','#143429');P.veins(x,'#d9b565',44,13)}},
+  {name:'ピンクローズ',ink:'#3a2a2e',sub:'#a8833c',nameC:'#3a2a2e',script:1,paint:x=>{P.grad(x,'#fde9ee','#f5c6d2');P.rose(x,95,110,105,'#f48fa6','#ee6f8e');P.rose(x,150,370,120,'#f7a3b6','#ef7c98');P.rose(x,20,270,70,'#f9b9c7','#f291a8')}},
+  {name:'ナイトビュー',ink:'#ffffff',sub:'#f0d48a',nameC:'#f0d48a',paint:x=>{P.grad(x,'#070b26','#1c2c72');P.skyline(x,66)}},
+  {name:'パープルリリー',ink:'#ffffff',sub:'#e9d9ff',nameC:'#ffffff',paint:x=>{P.grad(x,'#06030c','#160a26');P.rays(x,'#c05cff',120,250,77);P.flower(x,120,250,170,'#d77bff','#5a189a')}},
+  {name:'パールホワイト',ink:'#2a2622',sub:'#9a7b35',nameC:'#2a2622',script:1,crown:1,paint:x=>{P.grad(x,'#fbf8f1','#e9e0cf');P.veins(x,'#d8cdb8',88,8);P.pearls(x,89)}},
+  {name:'ティール×ゴールド',ink:'#ffffff',sub:GOLD,nameC:'#f0d48a',paint:x=>{P.grad(x,'#0b3f46','#08242a');P.swirl(x,'#e6c36a',99)}},
+  {name:'レッドローズ',ink:'#ffffff',sub:GOLD,nameC:'#f3e6c0',paint:x=>{P.grad(x,'#0a0404','#210a0a');P.petals(x,'#c1121f',101);P.rose(x,95,120,115,'#d1162a','#8f0d1b');P.rose(x,120,390,125,'#c21124','#7d0a16')}}
+];
+const CARD_NOTE='このQRコードを読み取ってチェックインしてください';
+async function cardCanvas(c,di){
+  const d=DESIGNS[di]||DESIGNS[0],cv=document.createElement('canvas'),x=cv.getContext('2d');
+  const serif='"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif',sans='"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif',script='"Great Vibes","Snell Roundhand",cursive';
+  const ro=romajiOf(c),name=String(c.name||''),rows=[['会社名',c.company],['役職',c.title],['電話番号',c.phone],['誕生日',fmtBday(c)]].map(r=>[r[0],String(r[1]||'—')]);
+  cv.width=CW;cv.height=CH;
+  try{await Promise.race([Promise.all([document.fonts.load('600 90px "Noto Serif JP"',name+ro),document.fonts.load('500 36px "Noto Sans JP"',rows.flat().join('')+CARD_NOTE),document.fonts.load('100px "Great Vibes"',ro||'A')]),new Promise(r=>setTimeout(r,2500))])}catch{}
+  const fit=(t,font,size,max,min)=>{x.font=font.replace('SZ',size);while(x.measureText(t).width>max&&size>min){size-=2;x.font=font.replace('SZ',size)}};
+  x.save();x.beginPath();x.roundRect(0,0,CW,CH,40);x.clip();d.paint(x);
+  x.strokeStyle=d.sub;x.globalAlpha=.55;x.lineWidth=6;x.beginPath();x.roundRect(3,3,CW-6,CH-6,38);x.stroke();x.globalAlpha=1;
+  x.textAlign='center';x.textBaseline='middle';
+  const cx=530,maxW=590,top=d.crown?34:0;
+  if(d.crown)P.crown(x,cx,84,42,GOLD);
+  if(d.script&&ro){
+    x.fillStyle=d.nameC;fit(ro,'SZpx '+script,128,maxW+50,50);x.fillText(ro,cx,188+top);
+    x.fillStyle=d.ink;x.letterSpacing='10px';fit(name,'600 SZpx '+serif,54,maxW,24);x.fillText(name,cx,300+top*.6);
+  }else{
+    x.fillStyle=d.nameC;x.letterSpacing='12px';fit(name,'600 SZpx '+serif,100,maxW,30);x.fillText(name,cx,(ro?200:238)+top);
+    if(ro){x.letterSpacing='3px';x.fillStyle=d.sub;fit(ro,'500 SZpx '+serif,42,maxW,20);x.fillText(ro,cx,296+top*.7)}
+  }
+  x.letterSpacing='0px';
+  x.strokeStyle=d.sub;x.lineWidth=3;x.beginPath();x.moveTo(880,90);x.lineTo(880,360);x.stroke();
+  x.textAlign='left';x.fillStyle=d.ink;
+  rows.forEach((r,i)=>{
+    const y=126+i*66;let v=r[1];
+    x.font='500 34px '+sans;x.fillText(r[0],925,y);
+    fit(v,'500 SZpx '+sans,36,330,24);while(x.measureText(v).width>330&&v.length>2)v=v.slice(0,-2)+'…';
+    x.fillText(v,1095,y);
+  });
+  const bx=1462,by=70,bs=300;
+  x.fillStyle='#ffffff';x.beginPath();x.roundRect(bx,by,bs,bs,26);x.fill();x.strokeStyle=GOLD;x.lineWidth=8;x.stroke();
+  const code=makeQr(c.id),n=code.getModuleCount(),cell=Math.max(2,Math.floor((bs-56)/n)),o=Math.floor((bs-cell*n)/2);
+  x.fillStyle='#000000';
+  for(let r=0;r<n;r++)for(let q=0;q<n;q++)if(code.isDark(r,q))x.fillRect(bx+o+q*cell,by+o+r*cell,cell,cell);
+  x.strokeStyle=d.sub;x.lineWidth=4;x.beginPath();x.roundRect(905,403,22,36,5);x.stroke();
+  x.fillStyle=d.ink;x.font='500 30px '+sans;x.fillText(CARD_NOTE,945,422);
+  x.restore();
+  return cv;
+}
+const canvasBlob=(cv,type,q)=>new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('encode')),type||'image/png',q));
+async function cardBlob(c){return canvasBlob(await cardCanvas(c,cardDesign))}
+function qrOnlyBlob(c){
+  const code=makeQr(c.id),n=code.getModuleCount(),cell=24,m=4,cv=document.createElement('canvas'),x=cv.getContext('2d');
+  cv.width=cv.height=(n+m*2)*cell;x.fillStyle='#ffffff';x.fillRect(0,0,cv.width,cv.height);x.fillStyle='#000000';
+  for(let r=0;r<n;r++)for(let q=0;q<n;q++)if(code.isDark(r,q))x.fillRect((q+m)*cell,(r+m)*cell,cell,cell);
+  return canvasBlob(cv);
+}
+async function renderCardBox(){
+  const c=selected;if(!c)return;
+  const key=[cardDesign,c.id,c.name,c.kana,c.romaji,c.company,c.title,c.phone,c.birthday].join('|');
+  if(key===cardKey&&el('cardBox').firstChild)return;
+  cardKey=key;
+  const cv=await cardCanvas(c,cardDesign);
+  if(cardKey!==key)return;
+  cv.setAttribute('role','img');cv.setAttribute('aria-label',c.name+' 様のQRカード');el('cardBox').replaceChildren(cv);
+}
+async function renderDesigns(){
+  const sample={id:'sample',name:'中村 海斗',kana:'なかむら かいと',company:'中村歯科クリニック',title:'院長',phone:'090-0000-0108',birthday:'1976-09-09'};
+  el('designGrid').innerHTML=DESIGNS.map((d,i)=>'<button class="dbtn'+(i===cardDesign?' on':'')+'" data-design="'+i+'" aria-pressed="'+(i===cardDesign)+'"><canvas width="450" height="120"></canvas><span>'+(i+1)+'. '+esc(d.name)+'</span></button>').join('');
+  for(let i=0;i<DESIGNS.length;i++){
+    const cv=await cardCanvas(sample,i),t=el('designGrid').querySelector('[data-design="'+i+'"] canvas');
+    if(t)t.getContext('2d').drawImage(cv,0,0,450,120);
+  }
+}
+function markDesign(){el('designGrid').querySelectorAll('[data-design]').forEach(b=>{const on=Number(b.dataset.design)===cardDesign;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))})}
+el('designGrid').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-design]');if(!b||!db)return;
+  const n=Number(b.dataset.design);
+  try{await db.doc('settings/card').set({design:n});cardDesign=n;markDesign();if(detail.open)renderCardBox();toast('カードのデザインを「'+DESIGNS[n].name+'」にしました')}
+  catch(err){toast(dbMessage(err))}
+});
+async function printHtml(list){
+  const cards=[];
+  for(const c of list){
+    const cv=await cardCanvas(c,cardDesign),f=document.createElement('canvas'),x=f.getContext('2d');
+    f.width=1350;f.height=360;x.fillStyle='#ffffff';x.fillRect(0,0,1350,360);x.drawImage(cv,0,0,1350,360);
+    cards.push('<div class="card"><img src="'+f.toDataURL('image/jpeg',.9)+'" alt="'+esc(c.name)+' 様のQRカード"></div>');
+  }
+  return '<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QRカード印刷</title><style>@page{size:A4;margin:10mm}body{margin:0;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;color:#111;background:#fff}.bar{padding:14px;font-size:14px;background:#eef4ea}.bar button{font:inherit;padding:8px 18px;margin-right:10px}.card{padding:2mm 0;border-bottom:1px dashed #999;break-inside:avoid}.card img{display:block;width:180mm;max-width:100%;margin:0 auto}@media print{.bar{display:none}}</style><div class="bar"><button onclick="window.print()">印刷する</button>A4用紙1枚に5名分です。点線に沿って切ってお使いください。</div>'+cards.join('')+'</html>';
 }
 async function savePrint(list,filename){
   if(!list.length){toast('印刷するお客様がいません');return}
-  try{await dl.save({filename,data:printHtml(list)});toast('保存しました。ファイルを開いて「印刷する」を押してください')}
+  toast('印刷用ファイルを作成しています…');
+  try{await dl.save({filename,data:await printHtml(list)});toast('保存しました。ファイルを開いて「印刷する」を押してください')}
   catch(e){if(e?.code!=='declined')toast('印刷用ファイルを保存できませんでした')}
 }
+el('btnQrOnly').addEventListener('click',async()=>{
+  if(!dl||!selected)return;
+  try{await dl.save({filename:'QR_'+safeName(selected.name)+'.png',data:await qrOnlyBlob(selected)});toast('QRコードを保存しました')}
+  catch(e){if(e?.code!=='declined')toast('QRコードを保存できませんでした')}
+});
 function copyText(text,ok){
   const fallback=()=>{el('linkText').value=text;el('linkText').focus();el('linkText').select();toast('自動でコピーできませんでした。選択した文字をコピーしてください')};
   try{navigator.clipboard.writeText(text).then(()=>toast(ok),fallback)}catch{fallback()}
@@ -1017,7 +1182,7 @@ el('loginForm').addEventListener('submit',async e=>{
 function renderAdmins(){
   el('adminList').innerHTML=admins.map(a=>'<li><span>'+esc(a.name||a.loginId)+'　<span class="note">ID：'+esc(a.loginId)+'</span></span>'+(me&&a.id===me.id?'<span class="badge">ログイン中</span>':'<button class="link" data-del="'+esc(a.id)+'">'+(armedAdmin===a.id?'本当に削除する':'削除')+'</button>')+'</li>').join('');
 }
-function openAdmins(){armedAdmin='';el('aError').textContent='';renderAdmins();adminDlg.showModal()}
+function openAdmins(){armedAdmin='';el('aError').textContent='';renderAdmins();adminDlg.showModal();renderDesigns()}
 el('adminForm').addEventListener('submit',async e=>{
   e.preventDefault();
   el('aError').textContent='';el('aAdd').disabled=true;
@@ -1059,13 +1224,14 @@ el('btnLogout').addEventListener('click',()=>{me=null;saveLogin('');refreshGate(
   },err=>{clearTimeout(timer);ready=false;el('rows').innerHTML='';setEmpty('名簿を読み込めませんでした',err?.code==='revoked'?'この名簿を見る権限がなくなりました。':'ページを開き直してください。');el('count').textContent='読み込みエラー'});
   db.collection('staff').onSnapshot(snap=>{staff=snap.docs.map(d=>({id:d.id,name:String(d.data().name||''),role:d.data().role==='kuro'?'kuro':'cast'}));sortStaff();if(staffDlg.open||vdlg.open)renderStaff()},()=>{});
   db.doc('settings/shop').onSnapshot(s=>{shopName=String(s.data()?.name||'');showShop()},()=>{});
+  db.doc('settings/card').onSnapshot(s=>{const n=Number(s.data()?.design);cardDesign=Number.isInteger(n)&&n>=0&&n<DESIGNS.length?n:0;markDesign();if(detail.open)renderCardBox()},()=>{});
   db.collection('admins').onSnapshot(snap=>{
     admins=snap.docs.map(d=>({id:d.id,loginId:String(d.data().loginId||''),name:String(d.data().name||''),salt:String(d.data().salt||''),hash:String(d.data().hash||'')})).sort((a,b)=>a.loginId.localeCompare(b.loginId));
     adminsReady=true;refreshGate();
     if(adminDlg.open)renderAdmins();
   },()=>{el('gateMsg').hidden=false;el('gateMsg').textContent='読み込めませんでした。ページを開き直してください。'});
   dl=await use('downloads');
-  if(dl)for(const id of ['btnCsv','btnPrint','btnCard','btnPrintOne'])el(id).hidden=false;
+  if(dl)for(const id of ['btnCsv','btnPrint','btnCard','btnQrOnly','btnPrintOne'])el(id).hidden=false;
   assets=await use('assets');
   
   
