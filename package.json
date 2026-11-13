@@ -1,0 +1,1 @@
+{"name":"customer-note","private":true,"version":"0.1.0","description":"お客様ノート：QRチェックイン付き顧客管理（デモ版）","scripts":{"test":"node test/run.js ."},"devDependencies":{"playwright":"^1.48.0"}}

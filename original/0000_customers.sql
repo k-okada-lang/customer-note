@@ -1,0 +1,1 @@
+CREATE TABLE customers (id TEXT PRIMARY KEY NOT NULL, data TEXT NOT NULL, updated_at TEXT NOT NULL);
