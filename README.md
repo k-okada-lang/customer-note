@@ -1,4 +1,9 @@
-# お客様ノート（デモ版）
+# お客様ノート（更新終了）
+
+> **このリポジトリの更新は終了しました。** お客様ノートは Night POS に統合され、今後は
+> [k-okada-lang/night-pos](https://github.com/k-okada-lang/night-pos) で開発します。
+> 統合版の公開デモ： https://k-okada-lang.github.io/night-pos/
+
 
 ナイト業態向けの、QRチェックイン付き顧客管理システムのデモ画面です。
 現在は Claude の Artifact 上で動くデモで、本番は XServer に構築する予定です。
