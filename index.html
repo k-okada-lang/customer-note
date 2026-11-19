@@ -821,53 +821,64 @@ const P={
   }
 };
 const DESIGNS=[
-  {name:'ブラック×ゴールド',ink:'#ffffff',sub:GOLD,nameC:'#ffffff',crown:1,paint:x=>{P.grad(x,'#050505','#1b1508');P.swirl(x,'#e6c36a',11)}},
-  {name:'ホワイトマーブル',ink:'#2a2622',sub:'#9a7b35',nameC:'#2a2622',script:1,paint:x=>{P.grad(x,'#fdfbf6','#efe7d9');P.veins(x,'#c9a24e',22,12);P.veins(x,'#b9b0a2',23,8)}},
-  {name:'パープルナイト',ink:'#ffffff',sub:GOLD,nameC:'#ffffff',paint:x=>{P.grad(x,'#14062a','#3c1260');P.bokeh(x,['#f6d27a','#ff9bd2','#b98cff'],33)}},
-  {name:'エメラルドマーブル',ink:'#f3ead2',sub:GOLD,nameC:'#f1dc9c',crown:1,paint:x=>{P.grad(x,'#07140f','#143429');P.veins(x,'#d9b565',44,13)}},
-  {name:'ピンクローズ',ink:'#3a2a2e',sub:'#a8833c',nameC:'#3a2a2e',script:1,paint:x=>{P.grad(x,'#fde9ee','#f5c6d2');P.rose(x,95,110,105,'#f48fa6','#ee6f8e');P.rose(x,150,370,120,'#f7a3b6','#ef7c98');P.rose(x,20,270,70,'#f9b9c7','#f291a8')}},
-  {name:'ナイトビュー',ink:'#ffffff',sub:'#f0d48a',nameC:'#f0d48a',paint:x=>{P.grad(x,'#070b26','#1c2c72');P.skyline(x,66)}},
-  {name:'パープルリリー',ink:'#ffffff',sub:'#e9d9ff',nameC:'#ffffff',paint:x=>{P.grad(x,'#06030c','#160a26');P.rays(x,'#c05cff',120,250,77);P.flower(x,120,250,170,'#d77bff','#5a189a')}},
-  {name:'パールホワイト',ink:'#2a2622',sub:'#9a7b35',nameC:'#2a2622',script:1,crown:1,paint:x=>{P.grad(x,'#fbf8f1','#e9e0cf');P.veins(x,'#d8cdb8',88,8);P.pearls(x,89)}},
-  {name:'ティール×ゴールド',ink:'#ffffff',sub:GOLD,nameC:'#f0d48a',paint:x=>{P.grad(x,'#0b3f46','#08242a');P.swirl(x,'#e6c36a',99)}},
-  {name:'レッドローズ',ink:'#ffffff',sub:GOLD,nameC:'#f3e6c0',paint:x=>{P.grad(x,'#0a0404','#210a0a');P.petals(x,'#c1121f',101);P.rose(x,95,120,115,'#d1162a','#8f0d1b');P.rose(x,120,390,125,'#c21124','#7d0a16')}}
+  {name:'ブラック×ゴールド',ink:'#ffffff',nameC:'#ffffff',sub:GOLD,cx:.25,paint:x=>{P.grad(x,'#050505','#1b1508');P.swirl(x,'#e6c36a',11)}},
+  {name:'ホワイトマーブル',ink:'#2b2724',nameC:'#1f1b18',sub:'#a8843a',cx:.235,script:1,light:1,paint:x=>{P.grad(x,'#fdfbf6','#efe7d9');P.veins(x,'#c9a24e',22,12)}},
+  {name:'シャンパン',ink:'#ffffff',nameC:'#ffffff',sub:GOLD,cx:.31,paint:x=>{P.grad(x,'#14062a','#3c1260');P.bokeh(x,['#f6d27a','#ff9bd2','#b98cff'],33)}},
+  {name:'エメラルドマーブル',ink:'#ffffff',nameC:'#fbf6e8',sub:GOLD,cx:.25,paint:x=>{P.grad(x,'#07140f','#143429');P.veins(x,'#d9b565',44,13)}},
+  {name:'ピンクローズ',ink:'#2e2326',nameC:'#2a1f22',sub:'#a8833c',cx:.265,script:1,light:1,paint:x=>{P.grad(x,'#fde9ee','#f5c6d2');P.rose(x,95,110,105,'#f48fa6','#ee6f8e')}},
+  {name:'ナイトビュー',ink:'#ffffff',nameC:'#f2d48c',sub:'#f2d48c',cx:.25,paint:x=>{P.grad(x,'#070b26','#1c2c72');P.skyline(x,66)}},
+  {name:'パープルリリー',ink:'#ffffff',nameC:'#ffffff',sub:'#ffffff',cx:.30,paint:x=>{P.grad(x,'#06030c','#160a26');P.flower(x,120,250,170,'#d77bff','#5a189a')}},
+  {name:'パールホワイト',ink:'#2b2724',nameC:'#1f1b18',sub:'#a8843a',cx:.255,script:1,light:1,paint:x=>{P.grad(x,'#fbf8f1','#e9e0cf');P.pearls(x,89)}},
+  {name:'ティール×ゴールド',ink:'#ffffff',nameC:'#efcf7c',sub:'#efcf7c',cx:.265,paint:x=>{P.grad(x,'#0b3f46','#08242a');P.swirl(x,'#e6c36a',99)}},
+  {name:'レッドローズ',ink:'#ffffff',nameC:'#f1d9a0',sub:GOLD,cx:.25,paint:x=>{P.grad(x,'#0a0404','#210a0a');P.rose(x,95,120,115,'#d1162a','#8f0d1b')}}
 ];
 const CARD_NOTE='このQRコードを読み取ってチェックインしてください';
+const bgCache={};
+function cardBg(i){
+  if(!bgCache[i])bgCache[i]=new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src='cards/'+(i+1)+'.jpg';setTimeout(()=>res(null),6000)});
+  return bgCache[i];
+}
 async function cardCanvas(c,di){
   const d=DESIGNS[di]||DESIGNS[0],cv=document.createElement('canvas'),x=cv.getContext('2d');
   const serif='"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif',sans='"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif',script='"Great Vibes","Snell Roundhand",cursive';
   const ro=romajiOf(c),name=String(c.name||''),rows=[['会社名',c.company],['役職',c.title],['電話番号',c.phone],['誕生日',fmtBday(c)]].map(r=>[r[0],String(r[1]||'—')]);
   cv.width=CW;cv.height=CH;
-  try{await Promise.race([Promise.all([document.fonts.load('600 90px "Noto Serif JP"',name+ro),document.fonts.load('500 36px "Noto Sans JP"',rows.flat().join('')+CARD_NOTE),document.fonts.load('100px "Great Vibes"',ro||'A')]),new Promise(r=>setTimeout(r,2500))])}catch{}
+  const [bg]=await Promise.all([cardBg(DESIGNS.indexOf(d)),Promise.race([Promise.all([document.fonts.load('600 90px "Noto Serif JP"',name+ro),document.fonts.load('500 36px "Noto Sans JP"',rows.flat().join('')+CARD_NOTE),document.fonts.load('120px "Great Vibes"',ro||'A')]),new Promise(r=>setTimeout(r,2500))]).catch(()=>{})]);
   const fit=(t,font,size,max,min)=>{x.font=font.replace('SZ',size);while(x.measureText(t).width>max&&size>min){size-=2;x.font=font.replace('SZ',size)}};
-  x.save();x.beginPath();x.roundRect(0,0,CW,CH,40);x.clip();d.paint(x);
-  x.strokeStyle=d.sub;x.globalAlpha=.55;x.lineWidth=6;x.beginPath();x.roundRect(3,3,CW-6,CH-6,38);x.stroke();x.globalAlpha=1;
+  const glow=on=>{x.shadowColor=on?(d.light?'rgba(255,255,255,.7)':'rgba(0,0,0,.65)'):'transparent';x.shadowBlur=on?10:0};
+  x.save();x.beginPath();x.roundRect(0,0,CW,CH,30);x.clip();
+  if(bg)x.drawImage(bg,0,0,CW,CH);else d.paint(x);
   x.textAlign='center';x.textBaseline='middle';
-  const cx=530,maxW=590,top=d.crown?34:0;
-  if(d.crown)P.crown(x,cx,84,42,GOLD);
+  const cx=Math.round(CW*d.cx),maxW=620;
+  glow(1);
   if(d.script&&ro){
-    x.fillStyle=d.nameC;fit(ro,'SZpx '+script,128,maxW+50,50);x.fillText(ro,cx,188+top);
-    x.fillStyle=d.ink;x.letterSpacing='10px';fit(name,'600 SZpx '+serif,54,maxW,24);x.fillText(name,cx,300+top*.6);
+    x.fillStyle=d.nameC;fit(ro,'SZpx '+script,124,maxW+60,50);x.fillText(ro,cx,Math.round(CH*.47));
+    x.letterSpacing='8px';x.fillStyle=d.nameC;fit(name,'600 SZpx '+serif,60,maxW,24);x.fillText(name,cx,Math.round(CH*.70));
   }else{
-    x.fillStyle=d.nameC;x.letterSpacing='12px';fit(name,'600 SZpx '+serif,100,maxW,30);x.fillText(name,cx,(ro?200:238)+top);
-    if(ro){x.letterSpacing='3px';x.fillStyle=d.sub;fit(ro,'500 SZpx '+serif,42,maxW,20);x.fillText(ro,cx,296+top*.7)}
+    x.letterSpacing='10px';x.fillStyle=d.nameC;fit(name,'600 SZpx '+serif,92,maxW,30);x.fillText(name,cx,Math.round(CH*(ro?.49:.55)));
+    if(ro){x.letterSpacing='3px';x.fillStyle=d.sub;fit(ro,'500 SZpx '+serif,38,maxW,20);x.fillText(ro,cx,Math.round(CH*.685))}
   }
-  x.letterSpacing='0px';
-  x.strokeStyle=d.sub;x.lineWidth=3;x.beginPath();x.moveTo(880,90);x.lineTo(880,360);x.stroke();
-  x.textAlign='left';x.fillStyle=d.ink;
+  x.letterSpacing='0px';glow(0);
+  const gold=x.createLinearGradient(0,96,0,384);gold.addColorStop(0,'rgba(217,181,101,0)');gold.addColorStop(.15,GOLD);gold.addColorStop(.85,GOLD);gold.addColorStop(1,'rgba(217,181,101,0)');
+  x.strokeStyle=gold;x.lineWidth=3;x.beginPath();x.moveTo(837,96);x.lineTo(837,384);x.stroke();
+  x.textAlign='left';x.fillStyle=d.ink;glow(1);x.shadowBlur=6;
   rows.forEach((r,i)=>{
-    const y=126+i*66;let v=r[1];
-    x.font='500 34px '+sans;x.fillText(r[0],925,y);
-    fit(v,'500 SZpx '+sans,36,330,24);while(x.measureText(v).width>330&&v.length>2)v=v.slice(0,-2)+'…';
-    x.fillText(v,1095,y);
+    const y=[120,192,260,330][i];let v=r[1];
+    x.font='500 34px '+sans;x.fillText(r[0],871,y);
+    fit(v,'500 SZpx '+sans,36,370,24);while(x.measureText(v).width>370&&v.length>2)v=v.slice(0,-2)+'…';
+    x.fillText(v,1049,y);
   });
-  const bx=1462,by=70,bs=300;
-  x.fillStyle='#ffffff';x.beginPath();x.roundRect(bx,by,bs,bs,26);x.fill();x.strokeStyle=GOLD;x.lineWidth=8;x.stroke();
+  glow(0);
+  const bx=1440,by=64,bs=306;
+  x.shadowColor='rgba(240,200,110,.55)';x.shadowBlur=18;
+  x.fillStyle='#ffffff';x.beginPath();x.roundRect(bx,by,bs,bs,26);x.fill();x.shadowBlur=0;
+  const bg2=x.createLinearGradient(bx,by,bx+bs,by+bs);bg2.addColorStop(0,'#f3dc95');bg2.addColorStop(.5,'#c79a3e');bg2.addColorStop(1,'#f0d488');
+  x.strokeStyle=bg2;x.lineWidth=7;x.stroke();
   const code=makeQr(c.id),n=code.getModuleCount(),cell=Math.max(2,Math.floor((bs-56)/n)),o=Math.floor((bs-cell*n)/2);
   x.fillStyle='#000000';
   for(let r=0;r<n;r++)for(let q=0;q<n;q++)if(code.isDark(r,q))x.fillRect(bx+o+q*cell,by+o+r*cell,cell,cell);
-  x.strokeStyle=d.sub;x.lineWidth=4;x.beginPath();x.roundRect(905,403,22,36,5);x.stroke();
-  x.fillStyle=d.ink;x.font='500 30px '+sans;x.fillText(CARD_NOTE,945,422);
+  x.strokeStyle=GOLD;x.lineWidth=4;x.beginPath();x.roundRect(851,400,22,36,5);x.stroke();x.fillStyle=GOLD;x.fillRect(858,429,8,3);
+  x.fillStyle=d.ink;glow(1);x.shadowBlur=6;x.font='500 30px '+sans;x.fillText(CARD_NOTE,893,419);glow(0);
   x.restore();
   return cv;
 }
