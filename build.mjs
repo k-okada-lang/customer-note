@@ -1,5 +1,5 @@
 // GitHub Pages 用の単体ページを docs/ に作ります： node build.mjs
-import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, copyFile, readdir } from 'node:fs/promises';
 
 const src = await readFile('index.html', 'utf8');
 const cut = src.indexOf('</style>') + '</style>'.length;
@@ -20,5 +20,7 @@ ${head}
 await mkdir('docs', { recursive: true });
 await writeFile('docs/index.html', page);
 for (const f of ['qr.js', 'jsqr.js', 'standalone.js']) await copyFile(f, 'docs/' + f);
+await mkdir('docs/cards', { recursive: true });
+for (const f of await readdir('cards')) await copyFile('cards/' + f, 'docs/cards/' + f);
 await writeFile('docs/.nojekyll', '');
 console.log('docs/ を更新しました');

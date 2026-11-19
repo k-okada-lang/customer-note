@@ -4,6 +4,7 @@ const page0=()=>'<!doctype html><html><head><meta charset=utf8><meta name=viewpo
 const srv=http.createServer((q,r)=>{const u=q.url.split('?')[0];
   if(u==='/'){r.writeHead(200,{'content-type':'text/html;charset=utf-8'});r.end(page0())}
   else if(u==='/qr.js'||u==='/jsqr.js'){r.writeHead(200,{'content-type':'text/javascript'});r.end(fs.readFileSync(path.join(SRC,u)))}
+  else if(/^\/cards\/\d+\.jpg$/.test(u)&&fs.existsSync(path.join(SRC,u))){r.writeHead(200,{'content-type':'image/jpeg'});r.end(fs.readFileSync(path.join(SRC,u)))}
   else{r.writeHead(404);r.end()}});
 const MOCK=()=>{
   const flag=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch{return null}};
